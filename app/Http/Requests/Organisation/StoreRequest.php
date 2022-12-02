@@ -2,16 +2,17 @@
 
 namespace App\Http\Requests\Organisation;
 
-use App\Models\File;
-use App\Models\Organisation;
-use App\Models\SocialMedia;
-use App\Models\Taxonomy;
-use App\Rules\FileIsMimeType;
-use App\Rules\FileIsPendingAssignment;
-use App\Rules\RootTaxonomyIs;
 use App\Rules\Slug;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\File;
+use App\Models\Taxonomy;
+use App\Models\SocialMedia;
+use App\Models\Organisation;
+use App\Rules\UkPhoneNumber;
+use App\Rules\FileIsMimeType;
+use App\Rules\RootTaxonomyIs;
 use Illuminate\Validation\Rule;
+use App\Rules\FileIsPendingAssignment;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {
@@ -55,6 +56,7 @@ class StoreRequest extends FormRequest
                 'string',
                 'min:1',
                 'max:255',
+                new UkPhoneNumber('Organisation Phone - Please enter a valid UK telephone number.'),
             ],
             'logo_file_id' => [
                 'nullable',

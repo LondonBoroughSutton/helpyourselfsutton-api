@@ -2,26 +2,27 @@
 
 namespace App\Http\Requests\Service;
 
-use App\Http\Requests\HasMissingValues;
+use App\Rules\Slug;
 use App\Models\File;
 use App\Models\Role;
+use App\Rules\InOrder;
 use App\Models\Service;
 use App\Models\Taxonomy;
 use App\Models\UserRole;
-use App\Rules\CanUpdateCategoryTaxonomyRelationships;
-use App\Rules\CanUpdateServiceEligibilityTaxonomyRelationships;
+use App\Rules\NullableIf;
+use App\Rules\VideoEmbed;
+use App\Rules\UserHasRole;
+use App\Rules\UkPhoneNumber;
 use App\Rules\FileIsMimeType;
-use App\Rules\FileIsPendingAssignment;
-use App\Rules\InOrder;
+use App\Rules\RootTaxonomyIs;
+use Illuminate\Validation\Rule;
 use App\Rules\MarkdownMaxLength;
 use App\Rules\MarkdownMinLength;
-use App\Rules\NullableIf;
-use App\Rules\RootTaxonomyIs;
-use App\Rules\Slug;
-use App\Rules\UserHasRole;
-use App\Rules\VideoEmbed;
+use App\Rules\FileIsPendingAssignment;
+use App\Http\Requests\HasMissingValues;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Rules\CanUpdateCategoryTaxonomyRelationships;
+use App\Rules\CanUpdateServiceEligibilityTaxonomyRelationships;
 
 class UpdateRequest extends FormRequest
 {
@@ -121,7 +122,13 @@ class UpdateRequest extends FormRequest
             'video_embed' => ['nullable', 'string', 'url', 'max:255', new VideoEmbed()],
             'url' => ['url', 'max:255'],
             'contact_name' => ['nullable', 'string', 'min:1', 'max:255'],
-            'contact_phone' => ['nullable', 'string', 'min:1', 'max:255'],
+            'contact_phone' => [
+                'nullable',
+                'string',
+                'min:1',
+                'max:255',
+                new UkPhoneNumber('Service Contact Phone - Please enter a valid UK telephone number.'),
+            ],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'cqc_location_id' => ['nullable', 'string', 'regex:/^\d\-\d+$/'],
             'show_referral_disclaimer' => [

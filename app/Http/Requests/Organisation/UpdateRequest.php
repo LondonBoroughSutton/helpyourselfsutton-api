@@ -2,19 +2,20 @@
 
 namespace App\Http\Requests\Organisation;
 
-use App\Http\Requests\HasMissingValues;
-use App\Models\File;
-use App\Models\Organisation;
-use App\Models\SocialMedia;
-use App\Models\Taxonomy;
-use App\Rules\CanUpdateCategoryTaxonomyRelationships;
-use App\Rules\FileIsMimeType;
-use App\Rules\FileIsPendingAssignment;
-use App\Rules\NullableIf;
-use App\Rules\RootTaxonomyIs;
 use App\Rules\Slug;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\File;
+use App\Models\Taxonomy;
+use App\Rules\NullableIf;
+use App\Models\SocialMedia;
+use App\Models\Organisation;
+use App\Rules\UkPhoneNumber;
+use App\Rules\FileIsMimeType;
+use App\Rules\RootTaxonomyIs;
 use Illuminate\Validation\Rule;
+use App\Rules\FileIsPendingAssignment;
+use App\Http\Requests\HasMissingValues;
+use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\CanUpdateCategoryTaxonomyRelationships;
 
 class UpdateRequest extends FormRequest
 {
@@ -72,6 +73,7 @@ class UpdateRequest extends FormRequest
                 'string',
                 'min:1',
                 'max:255',
+                new UkPhoneNumber('Organisation Phone - Please enter a valid UK telephone number.'),
             ],
             'logo_file_id' => [
                 'nullable',
