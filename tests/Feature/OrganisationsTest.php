@@ -309,6 +309,30 @@ class OrganisationsTest extends TestCase
         $response->assertJsonFragment($responsePayload);
     }
 
+    public function test_global_admin_cannot_create_one_with_non_numeric_phone()
+    {
+        /**
+         * @var \App\Models\User $user
+         */
+        $user = factory(User::class)->create();
+        $user->makeGlobalAdmin();
+        $payload = [
+            'slug' => 'test-org',
+            'name' => 'Test Org',
+            'description' => 'Test description',
+            'url' => null,
+            'email' => null,
+            'phone' => 'Tel 01234 567890',
+            'category_taxonomies' => [],
+        ];
+
+        Passport::actingAs($user);
+
+        $response = $this->json('POST', '/core/v1/organisations', $payload);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public function test_all_global_admins_added_as_organisation_admin_when_one_is_created()
     {
         /**
@@ -580,8 +604,10 @@ class OrganisationsTest extends TestCase
         Passport::actingAs($user);
 
         $updateRequestCheckResponse = $this->get(
-            route('core.v1.update-requests.show',
-                ['update_request' => $updateRequestId])
+            route(
+                'core.v1.update-requests.show',
+                ['update_request' => $updateRequestId]
+            )
         );
 
         $updateRequestCheckResponse->assertSuccessful();
@@ -776,6 +802,31 @@ class OrganisationsTest extends TestCase
         $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJsonFragment(['data' => $payload]);
+    }
+
+    public function test_global_admin_cannot_update_with_non_numeric_phone()
+    {
+        $organisation = factory(Organisation::class)->create([
+            'url' => 'http://test-org.example.com',
+            'email' => 'info@test-org.example.com',
+            'phone' => '01234567890',
+        ]);
+        $user = factory(User::class)->create()->makeGlobalAdmin($organisation);
+
+        Passport::actingAs($user);
+
+        $payload = [
+            'slug' => 'test-org',
+            'name' => 'Test Org',
+            'description' => 'Test description',
+            'url' => null,
+            'email' => null,
+            'phone' => 'Tel 01234 567890',
+        ];
+
+        $response = $this->json('PUT', "/core/v1/organisations/{$organisation->id}", $payload);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function test_organisation_admin_can_update_organisation_taxonomies()
