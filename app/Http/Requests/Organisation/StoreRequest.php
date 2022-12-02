@@ -75,7 +75,10 @@ class StoreRequest extends FormRequest
             ])],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
             'category_taxonomies' => ['present', 'array'],
-            'category_taxonomies.*' => ['exists:taxonomies,id', new RootTaxonomyIs(Taxonomy::NAME_CATEGORY)],
+            'category_taxonomies.*' => [
+                'exists:taxonomies,id',
+                new RootTaxonomyIs(Taxonomy::NAME_CATEGORY),
+            ],
         ];
     }
 }
