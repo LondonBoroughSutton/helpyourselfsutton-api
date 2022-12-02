@@ -2,24 +2,25 @@
 
 namespace App\Http\Requests\Service;
 
-use App\Http\Requests\HasMissingValues;
+use App\Rules\Slug;
 use App\Models\File;
 use App\Models\Role;
+use App\Rules\InOrder;
 use App\Models\Service;
 use App\Models\Taxonomy;
 use App\Models\UserRole;
+use App\Rules\VideoEmbed;
+use App\Rules\UserHasRole;
+use App\Rules\UkPhoneNumber;
 use App\Rules\FileIsMimeType;
-use App\Rules\FileIsPendingAssignment;
-use App\Rules\InOrder;
-use App\Rules\IsOrganisationAdmin;
+use App\Rules\RootTaxonomyIs;
+use Illuminate\Validation\Rule;
 use App\Rules\MarkdownMaxLength;
 use App\Rules\MarkdownMinLength;
-use App\Rules\RootTaxonomyIs;
-use App\Rules\Slug;
-use App\Rules\UserHasRole;
-use App\Rules\VideoEmbed;
+use App\Rules\IsOrganisationAdmin;
+use App\Rules\FileIsPendingAssignment;
+use App\Http\Requests\HasMissingValues;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
@@ -95,7 +96,14 @@ class StoreRequest extends FormRequest
             'video_embed' => ['present', 'nullable', 'url', 'max:255', new VideoEmbed()],
             'url' => ['required', 'url', 'max:255'],
             'contact_name' => ['present', 'nullable', 'string', 'min:1', 'max:255'],
-            'contact_phone' => ['present', 'nullable', 'string', 'min:1', 'max:255'],
+            'contact_phone' => [
+                'present',
+                'nullable',
+                'string',
+                'min:1',
+                'max:255',
+                new UkPhoneNumber('Service Contact Phone - Please enter a valid UK telephone number.'),
+            ],
             'contact_email' => ['present', 'nullable', 'email', 'max:255'],
             'cqc_location_id' => ['present', 'nullable', 'string', 'regex:/^\d\-\d+$/'],
             'show_referral_disclaimer' => [
