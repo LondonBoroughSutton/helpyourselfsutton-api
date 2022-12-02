@@ -2,27 +2,27 @@
 
 namespace App\Http\Requests\Service;
 
-use App\Rules\Slug;
+use App\Http\Requests\HasMissingValues;
 use App\Models\File;
 use App\Models\Role;
-use App\Rules\InOrder;
 use App\Models\Service;
 use App\Models\Taxonomy;
 use App\Models\UserRole;
-use App\Rules\NullableIf;
-use App\Rules\VideoEmbed;
-use App\Rules\UserHasRole;
-use App\Rules\UkPhoneNumber;
-use App\Rules\FileIsMimeType;
-use App\Rules\RootTaxonomyIs;
-use Illuminate\Validation\Rule;
-use App\Rules\MarkdownMaxLength;
-use App\Rules\MarkdownMinLength;
-use App\Rules\FileIsPendingAssignment;
-use App\Http\Requests\HasMissingValues;
-use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CanUpdateCategoryTaxonomyRelationships;
 use App\Rules\CanUpdateServiceEligibilityTaxonomyRelationships;
+use App\Rules\FileIsMimeType;
+use App\Rules\FileIsPendingAssignment;
+use App\Rules\InOrder;
+use App\Rules\MarkdownMaxLength;
+use App\Rules\MarkdownMinLength;
+use App\Rules\NullableIf;
+use App\Rules\RootTaxonomyIs;
+use App\Rules\Slug;
+use App\Rules\UkPhoneNumber;
+use App\Rules\UserHasRole;
+use App\Rules\VideoEmbed;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {

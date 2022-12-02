@@ -2,20 +2,20 @@
 
 namespace App\Http\Requests\Organisation;
 
-use App\Rules\Slug;
-use App\Models\File;
-use App\Models\Taxonomy;
-use App\Rules\NullableIf;
-use App\Models\SocialMedia;
-use App\Models\Organisation;
-use App\Rules\UkPhoneNumber;
-use App\Rules\FileIsMimeType;
-use App\Rules\RootTaxonomyIs;
-use Illuminate\Validation\Rule;
-use App\Rules\FileIsPendingAssignment;
 use App\Http\Requests\HasMissingValues;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\File;
+use App\Models\Organisation;
+use App\Models\SocialMedia;
+use App\Models\Taxonomy;
 use App\Rules\CanUpdateCategoryTaxonomyRelationships;
+use App\Rules\FileIsMimeType;
+use App\Rules\FileIsPendingAssignment;
+use App\Rules\NullableIf;
+use App\Rules\RootTaxonomyIs;
+use App\Rules\Slug;
+use App\Rules\UkPhoneNumber;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRequest extends FormRequest
 {
