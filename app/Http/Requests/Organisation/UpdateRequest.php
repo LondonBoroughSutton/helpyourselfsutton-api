@@ -13,6 +13,7 @@ use App\Rules\FileIsPendingAssignment;
 use App\Rules\NullableIf;
 use App\Rules\RootTaxonomyIs;
 use App\Rules\Slug;
+use App\Rules\UkPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -72,6 +73,7 @@ class UpdateRequest extends FormRequest
                 'string',
                 'min:1',
                 'max:255',
+                new UkPhoneNumber('Organisation Phone - Please enter a valid UK telephone number.'),
             ],
             'logo_file_id' => [
                 'nullable',
@@ -92,7 +94,9 @@ class UpdateRequest extends FormRequest
                 ]),
             ],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
-            'category_taxonomies' => ['array', new CanUpdateCategoryTaxonomyRelationships($this->user('api'), $this->organisation),
+            'category_taxonomies' => [
+                'array',
+                new CanUpdateCategoryTaxonomyRelationships($this->user('api'), $this->organisation),
             ],
             'category_taxonomies.*' => [
                 'exists:taxonomies,id',

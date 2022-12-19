@@ -18,6 +18,7 @@ use App\Rules\MarkdownMinLength;
 use App\Rules\NullableIf;
 use App\Rules\RootTaxonomyIs;
 use App\Rules\Slug;
+use App\Rules\UkPhoneNumber;
 use App\Rules\UserHasRole;
 use App\Rules\VideoEmbed;
 use Illuminate\Foundation\Http\FormRequest;
@@ -118,10 +119,22 @@ class UpdateRequest extends FormRequest
             'fees_text' => ['nullable', 'string', 'min:1', 'max:255'],
             'fees_url' => ['nullable', 'url', 'max:255'],
             'testimonial' => ['nullable', 'string', 'min:1', 'max:255'],
-            'video_embed' => ['nullable', 'string', 'url', 'max:255', new VideoEmbed()],
+            'video_embed' => [
+                'nullable',
+                'string',
+                'url',
+                'max:255',
+                new VideoEmbed(),
+            ],
             'url' => ['url', 'max:255'],
             'contact_name' => ['nullable', 'string', 'min:1', 'max:255'],
-            'contact_phone' => ['nullable', 'string', 'min:1', 'max:255'],
+            'contact_phone' => [
+                'nullable',
+                'string',
+                'min:1',
+                'max:255',
+                new UkPhoneNumber('Service Contact Phone - Please enter a valid UK telephone number.'),
+            ],
             'contact_email' => ['nullable', 'email', 'max:255'],
             'cqc_location_id' => ['nullable', 'string', 'regex:/^\d\-\d+$/'],
             'show_referral_disclaimer' => [

@@ -10,6 +10,7 @@ use App\Rules\FileIsMimeType;
 use App\Rules\FileIsPendingAssignment;
 use App\Rules\RootTaxonomyIs;
 use App\Rules\Slug;
+use App\Rules\UkPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -55,6 +56,7 @@ class StoreRequest extends FormRequest
                 'string',
                 'min:1',
                 'max:255',
+                new UkPhoneNumber('Organisation Phone - Please enter a valid UK telephone number.'),
             ],
             'logo_file_id' => [
                 'nullable',
@@ -73,7 +75,10 @@ class StoreRequest extends FormRequest
             ])],
             'social_medias.*.url' => ['required_with:social_medias.*', 'url', 'max:255'],
             'category_taxonomies' => ['present', 'array'],
-            'category_taxonomies.*' => ['exists:taxonomies,id', new RootTaxonomyIs(Taxonomy::NAME_CATEGORY)],
+            'category_taxonomies.*' => [
+                'exists:taxonomies,id',
+                new RootTaxonomyIs(Taxonomy::NAME_CATEGORY),
+            ],
         ];
     }
 }
