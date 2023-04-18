@@ -1865,6 +1865,46 @@ class ServicesTest extends TestCase
         ]);
     }
 
+    public function test_offerings_are_returned_in_order()
+    {
+        $service = factory(Service::class)->create();
+        $taxonomy = factory(Taxonomy::class)->create();
+        $service->usefulInfos()->create([
+            'title' => 'Did You Know?',
+            'description' => 'This is a test description',
+            'order' => 1,
+        ]);
+        $service->offerings()->createMany([
+            [
+                'offering' => 'First club',
+                'order' => 1,
+            ],
+            [
+                'offering' => 'Second club',
+                'order' => 2,
+            ],
+            [
+                'offering' => 'Third club',
+                'order' => 3,
+            ],
+        ]);
+        $service->socialMedias()->create([
+            'type' => SocialMedia::TYPE_INSTAGRAM,
+            'url' => 'https://www.instagram.com/ayupdigital/',
+        ]);
+        $service->serviceTaxonomies()->create([
+            'taxonomy_id' => $taxonomy->id,
+        ]);
+
+        $response = $this->json('GET', "/core/v1/services/{$service->slug}");
+
+        $response->assertStatus(Response::HTTP_OK);
+        $offerings = $response->json('data.offerings');
+        $this->assertEquals(1, $offerings[0]['order']);
+        $this->assertEquals(2, $offerings[1]['order']);
+        $this->assertEquals(3, $offerings[2]['order']);
+    }
+
     public function test_audit_created_when_viewed()
     {
         $this->fakeEvents();
