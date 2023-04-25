@@ -1,6 +1,6 @@
 ---
 defaults: &defaults
-  buildpack: php_buildpack
+  buildpack: https://github.com/cloudfoundry/php-buildpack.git#v4.4.68
   services:
   - name: hys-db
   - name: sutton-redis
