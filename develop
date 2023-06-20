@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-# Set script scope environment variables for dev or CI.
+# Set the docker-compose files to use.
+COMPOSE="docker-compose"
+
+# Set script scope environment variables to be used in testing
 export APP_PORT=${APP_PORT:-80}
 export DB_PORT=${DB_PORT:-3306}
 export DB_ROOT_PASS=${DB_ROOT_PASS:-secret}
@@ -8,15 +11,8 @@ export DB_NAME=${DB_NAME:-helpyourselfsutton}
 export DB_USER=${DB_USER:-helpyourselfsutton}
 export DB_PASS=${DB_PASS:-secret}
 export ELASTICSEARCH_PORT=${ELASTICSEARCH_PORT:-9200}
-export CF_ENV_SERVICE=${CF_ENV_SERVICE:-''}
-export CF_ENV_SERVICE_KEY=${CF_ENV_SERVICE_KEY:-''}
-export CF_USERNAME=${CF_USERNAME:-''}
-export CF_PASSWORD=${CF_PASSWORD:-''}
-export CF_ORGANISATION=${CF_ORGANISATION:-''}
-export CF_SPACE=${CF_SPACE:-''}
-
-# Set the docker-compose files to use.
-DOCKER_COMPOSE="docker-compose"
+export KIBANA_PORT=${KIBANA_PORT:-5601}
+export CFN_TEMPLATE=${CFN_TEMPLATE:-cloudformation}
 
 # Disable pseudo-TTY allocation for CI. The -T flag removes interaction.
 TTY=""
@@ -25,67 +21,82 @@ TTY=""
 # this is running in a CI environment.
 if [[ ${CI:-false} == "true" ]]; then
     TTY="-T"
+else
+    # Get the script directory
+    script_dir=`dirname $0`
+
+    # Set environment variables for dev
+    source $script_dir/.env
+
+    export WWWUID="$(id -u)"
 fi
 
 # Pass arguments to docker-compose, or default to docker-compose ps.
 if [[ $# -gt 0  ]]; then
     case "$1" in
 
+        # Run an artisan command inside a new container
         art|artisan )
             shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
+            ${COMPOSE} run --rm ${TTY} \
+                -w /var/www/html \
+                -e WWWUID=${WWWUID} \
                 app \
                 php artisan "$@"
             ;;
 
+        # Open a shell inside a new container
         bash )
             shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
+            $COMPOSE run --rm ${TTY} \
                 -w /var/www/html \
+                -e WWWUID=${WWWUID} \
                 app \
                 bash "$@"
             ;;
 
+        # Run a composer command inside a new container
         composer )
             shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
+            ${COMPOSE} run --rm ${TTY} \
+                -w /var/www/html \
+                -e WWWUID=${WWWUID} \
+                -e COMPOSER_MEMORY_LIMIT=-1 \
                 app \
                 composer "$@"
             ;;
 
+        # Run a node command inside a new container
         npm )
             shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
+            ${COMPOSE} run --rm ${TTY} \
+                -w /var/www/html \
+                -e WWWUID=${WWWUID} \
                 node \
                 npm "$@"
             ;;
 
-        store )
+        # Run PHPUnit tests inside a new container
+        test )
             shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
-                -e CF_ENV_SERVICE=${CF_ENV_SERVICE:-''} \
-                -e CF_ENV_SERVICE_KEY=${CF_ENV_SERVICE_KEY:-''} \
-                -e CF_USERNAME=${CF_USERNAME:-''} \
-                -e CF_PASSWORD=${CF_PASSWORD:-''} \
-                -e CF_ORGANISATION=${CF_ORGANISATION:-''} \
-                -e CF_SPACE=${CF_SPACE:-''} \
+            $COMPOSE run --rm ${TTY} \
                 -w /var/www/html \
+                -e WWWUID=${WWWUID} \
                 app \
-                bash .cloudfoundry/store.sh
+                vendor/bin/phpunit "$@"
             ;;
 
-        deploy )
-            shift 1
-            ${DOCKER_COMPOSE} run --rm ${TTY} \
-                -e ENVIRONMENT=${ENVIRONMENT:-'staging'} \
-                -e CI=${CI:-false} \
-                app \
-                bash .travis/deploy.sh
+        # Run the Cloudformation generate command inside a new container
+        cfn|cloudformation )
+            ${COMPOSE} run --rm troposphere > aws/${CFN_TEMPLATE}.json
+            cat aws/${CFN_TEMPLATE}.json
             ;;
 
-        * ) ${DOCKER_COMPOSE} "$@"; ;;
+        # Run a docker-compose command
+        * ) ${COMPOSE} "$@"; ;;
 
     esac
 else
-    ${DOCKER_COMPOSE} ps
+    # Default; list the running containers
+    ${COMPOSE} ps
 fi
