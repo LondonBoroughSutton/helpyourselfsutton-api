@@ -1,5 +1,5 @@
 # Set base image.
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # Set maintainer to Ayup Digital.
 LABEL maintainer="Ayup Digital"
@@ -11,23 +11,23 @@ ENV LANGUAGE en_GB:en
 ENV LC_ALL en_GB.UTF-8
 
 # Install generic software.
-RUN apt-get update \
-    && apt-get install -y locales nginx curl wget zip unzip git \
-    software-properties-common supervisor \
+RUN apt update \
+    && apt install -y locales nginx curl wget zip unzip git \
+    software-properties-common apt-transport-https supervisor \
     && locale-gen en_GB.UTF-8
 
 # Install PHP.
-RUN apt-add-repository -y ppa:ondrej/php \
-    && apt-get update \
-    && apt-get install -y php7.4-fpm php7.4-cli php7.4-gd php7.4-mysql php7.4-redis \
+RUN add-apt-repository -y ppa:ondrej/php \
+    && apt update -y \
+    && apt install -y php7.4-fpm php7.4-cli php7.4-gd php7.4-mysql php7.4-redis \
        php7.4-imap php7.4-mbstring php7.4-xml php7.4-curl php7.4-zip \
     && php -r "readfile('http://getcomposer.org/installer');" | php -- --install-dir=/usr/bin/ --filename=composer \
     && mkdir /run/php
 
 # Cleanup.
-RUN apt-get remove -y --purge software-properties-common \
-    && apt-get -y autoremove \
-    && apt-get clean \
+RUN apt remove -y --purge software-properties-common \
+    && apt -y autoremove \
+    && apt clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Redirect NGINX output to stdout and stderr.
