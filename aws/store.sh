@@ -1,31 +1,21 @@
 #!/usr/bin/env bash
 
 # ================================
-# Stores an object in the AWS S3 Secrets Bucket
-# This script will install the AWS CLI and the CF CLI
-# If you don't want these on your system, install using the docker helper script.
-# First, if you have an environment file, set the environment variables:
-# source .cloudfoundry/environment.[environment]
-# export CF_USERNAME CF_PASSWORD CF_ORGANISATION CF_SPACE CF_ENV_SERVICE CF_ENV_SERVICE_KEY
-# Then run the helper script:
-# ./develop store
+# Manage objects in a AWS S3 Bucket
+# This script will install the AWS CLI
+# If you don't want this on your system, install using the docker helper script.
 # ================================
 
-# Requires the following environment variables:
-# $CF_ENV_SERVICE = The name of the S3 bucket to store the files
-# $CF_ENV_SERVICE_KEY = The name of the service key that holds the access credentials
-
 # Can accept the following environment variables
-# $CF_USERNAME = The Cloud Foundry username.
-# $CF_PASSWORD = The Cloud Foundry password.
-# $CF_ORGANISATION = The Cloud Foundry organisation.
-# $CF_SPACE = The Cloud Foundry space.
+# $AWS_ACCESS_KEY_ID = AWS IAM user Access Key ID.
+# $AWS_SECRET_ACCESS_KEY = AWS IAM user Access Key Secret.
+# $AWS_DEFAULT_REGION = The region the bucket is in, e.g. eu-west-2.
+# $AWS_BUCKET_NAME = The name of the AWS S3 bucket to use
 
 # Bail out on first error.
 set -e
 
 # Set environment variables.
-CF_API='https://api.cloud.service.gov.uk'
 APPROOT=${APPROOT:-'/var/www/html'}
 RED='\e[1;31m'
 BLUE='\e[1;34m'
