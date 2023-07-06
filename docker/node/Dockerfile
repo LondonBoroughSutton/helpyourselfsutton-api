@@ -1,5 +1,5 @@
 # Set base image.
-FROM node:16.13
+FROM node:lts-fermium
 
 # Set maintainer to Ayup Digital.
 LABEL maintainer="Ayup Digital"
